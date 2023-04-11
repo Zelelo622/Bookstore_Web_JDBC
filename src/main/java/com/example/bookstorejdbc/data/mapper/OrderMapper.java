@@ -7,6 +7,7 @@ import com.example.bookstorejdbc.data.entity.Buyer;
 import com.example.bookstorejdbc.data.entity.Order;
 import com.example.bookstorejdbc.repository.BookRepository;
 import com.example.bookstorejdbc.repository.BuyerRepository;
+import com.example.bookstorejdbc.service.BookService;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -16,28 +17,25 @@ import java.util.stream.Collectors;
 @Component
 public class OrderMapper {
 
-    private final BuyerRepository buyerRepository;
     private final BookRepository bookRepository;
 
-    public OrderMapper(BuyerRepository buyerRepository, BookRepository bookRepository) {
-        this.buyerRepository = buyerRepository;
+    public OrderMapper(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
 
     public OrderDto toDto(Order entity) {
         OrderDto dto = new OrderDto();
         dto.setTotalPrice(entity.getTotal_price());
-        dto.setBuyerId(entity.getBuyer().getBuyer_id());
-        List<Integer> bookIds = entity.getBook().stream().map(Book::getBook_id).collect(Collectors.toList());
-        dto.setBookIds(bookIds);
+        dto.setBuyerId(entity.getBuyer_id());
+        dto.setBookIds(entity.getBookIds());
         return dto;
     }
 
     public Order toEntity(OrderDto dto) {
         Order entity = new Order();
         entity.setTotal_price(dto.getTotalPrice());
-        entity.setBuyer(buyerRepository.findById(dto.getBuyerId()));
-        entity.setBook(bookRepository.getAllById(dto.getBookIds()));
+        entity.setBuyer_id(dto.getBuyerId());
+        entity.setBookIds(dto.getBookIds());
         return entity;
     }
 }

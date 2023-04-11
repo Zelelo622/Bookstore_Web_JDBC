@@ -23,8 +23,4 @@ public class OrderBook {
     @NotNull
     @Column(name = "book_id")
     private Integer book_id;
-
-    @NotNull
-    @Column(name = "quantity")
-    private Integer quantity;
 }

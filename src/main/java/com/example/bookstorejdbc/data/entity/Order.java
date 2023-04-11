@@ -20,7 +20,7 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "orderb_id")
-    private Integer order_id;
+    private Integer orderb_id;
 
     @NotNull
     @Column(name = "total_price")
@@ -28,7 +28,7 @@ public class Order {
 
     @NotNull
     @Column(name = "buyer_id")
-    private Buyer buyer;
+    private Integer buyer_id;
 
-    private List<Book> book;
+    private List<Integer> bookIds;
 }

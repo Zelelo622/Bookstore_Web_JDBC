@@ -2,6 +2,7 @@ package com.example.bookstorejdbc.controller;
 
 import com.example.bookstorejdbc.data.dto.CategoryDto;
 import com.example.bookstorejdbc.data.dto.OrderDto;
+import com.example.bookstorejdbc.data.entity.Order;
 import com.example.bookstorejdbc.service.CategoryService;
 import com.example.bookstorejdbc.service.OrderService;
 import org.springframework.http.ResponseEntity;
@@ -19,37 +20,37 @@ public class OrderController {
     }
 
     @GetMapping("/order")
-    public List<OrderDto> getAllOrder() {
-        return service.getAll();
+    public List<OrderDto> getAllOrders() {
+        return service.getAllOrders();
     }
 
-//    @GetMapping("/order/{id}")
-//    public OrderDto getOrderById(@PathVariable Integer id) {
-//        return service.getById(id);
-//    }
+    @GetMapping("/order/{id}")
+    public OrderDto getOrderById(@PathVariable Integer id) {
+        return service.getOrderById(id);
+    }
 
-    @DeleteMapping("/order/delete/{id}")
+    @PostMapping("/order/new")
+    public void createOrder(@RequestBody OrderDto order) {
+        service.createOrder(order);
+    }
+
+    @PutMapping("/order/{id}")
+    public void updateOrder(@PathVariable Integer id, @RequestBody OrderDto order) {
+        service.updateOrder(id, order);
+    }
+
+    @DeleteMapping("/order/{id}")
     public void deleteOrder(@PathVariable Integer id) {
         service.deleteOrder(id);
     }
 
-    @PostMapping("/order/new")
-    public void addOrder(@RequestBody OrderDto order) {
-        service.addNewOrder(order);
+    @PostMapping("/order/{orderId}/books/{bookId}")
+    public void addBookToOrder(@PathVariable Integer orderId, @PathVariable Integer bookId) {
+        service.addBookToOrder(orderId, bookId);
     }
 
-    @PutMapping("/order/edit/{id}")
-    public void editOrder(@RequestBody OrderDto category, @PathVariable Integer id) {
-        service.updateOrder(category, id);
-    }
-
-    @GetMapping("/order/{id}")
-    public ResponseEntity<OrderDto> getOrderById1(@PathVariable("id") Integer id) {
-        OrderDto orderDto = service.getOrderById(id);
-        if (orderDto == null) {
-            return ResponseEntity.notFound().build();
-        } else {
-            return ResponseEntity.ok(orderDto);
-        }
+    @DeleteMapping("/order/{orderId}/books/{bookId}")
+    public void removeBookFromOrder(@PathVariable Integer orderId, @PathVariable Integer bookId) {
+        service.removeBookFromOrder(orderId, bookId);
     }
 }
