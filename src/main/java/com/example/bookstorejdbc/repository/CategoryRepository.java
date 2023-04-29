@@ -34,7 +34,7 @@ public class CategoryRepository implements CrudRepository<Category> {
     public Optional<Category> findById(Integer id) {
         String sql = "SELECT * FROM category WHERE category_id=?";
         try {
-            return Optional.ofNullable(jdbcTemplate.queryForObject(sql,  BeanPropertyRowMapper.newInstance(Category.class), id));
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Category.class), id));
         } catch (Exception e) {
             return Optional.empty();
         }

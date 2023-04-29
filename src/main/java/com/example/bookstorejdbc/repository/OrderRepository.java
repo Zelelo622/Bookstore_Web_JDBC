@@ -1,10 +1,13 @@
 package com.example.bookstorejdbc.repository;
 
+import com.example.bookstorejdbc.data.entity.Category;
 import com.example.bookstorejdbc.data.entity.Order;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class OrderRepository {
@@ -26,11 +29,17 @@ public class OrderRepository {
 
         return order;
     }
-    public Order findById(Integer id) {
+
+    public Optional<Order> findById(Integer id) {
         String sql = "SELECT * FROM orderb WHERE orderb_id = ?";
-        Order order = jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Order.class), id);
-        order.setBookIds(getBookIdsForOrder(id));
-        return order;
+        try {
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Order.class), id));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+//        Order order = jdbcTemplate.queryForObject(sql, BeanPropertyRowMapper.newInstance(Order.class), id);
+//        order.setBookIds(getBookIdsForOrder(id));
+//        return order;
     }
 
     private List<Integer> getBookIdsForOrder(Integer orderId) {
