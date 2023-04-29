@@ -1,10 +1,14 @@
 package com.example.bookstorejdbc.controller;
 
+import com.example.bookstorejdbc.data.dto.BookDto;
 import com.example.bookstorejdbc.data.dto.PublishingHouseDto;
 import com.example.bookstorejdbc.service.PublishingHouseService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class PublishingHouseController {
@@ -20,13 +24,25 @@ public class PublishingHouseController {
     }
 
     @GetMapping("/publishing_house/{id}")
-    public PublishingHouseDto getPublishingHouseById(@PathVariable Integer id) {
-        return service.getById(id);
+    public ResponseEntity<?> getPublishingHouseById(@PathVariable Integer id) {
+        Optional<PublishingHouseDto> publishingHouseOptional = service.getById(id);
+        if (publishingHouseOptional.isPresent()) {
+            PublishingHouseDto publishingHouse = publishingHouseOptional.get();
+            return new ResponseEntity<>(publishingHouse, HttpStatus.OK);
+        } else {
+            String errorMessage = "Книга не найдена с id " + id;
+            return new ResponseEntity<>(errorMessage, HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/publishing_house/delete/{id}")
-    public void deletePublishingHouse(@PathVariable Integer id) {
-        service.deletePublishingHouse(id);
+    public ResponseEntity<String> deletePublishingHouse(@PathVariable Integer id) {
+        try {
+            service.deletePublishingHouse(id);
+            return new ResponseEntity<>("Издание удалена", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Ошибка удаления издания: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/publishing_house/new")
@@ -35,7 +51,12 @@ public class PublishingHouseController {
     }
 
     @PutMapping("/publishing_house/edit/{id}")
-    public void editPublishingHouse(@RequestBody PublishingHouseDto publishingHouse, @PathVariable Integer id) {
-        service.updatePublishingHouse(publishingHouse, id);
+    public ResponseEntity<String> editPublishingHouse(@RequestBody PublishingHouseDto publishingHouse, @PathVariable Integer id) {
+        try {
+            service.updatePublishingHouse(publishingHouse, id);
+            return new ResponseEntity<>("Издание обновлено", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Ошибка обновления издания: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

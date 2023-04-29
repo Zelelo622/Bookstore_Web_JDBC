@@ -2,18 +2,19 @@ package com.example.bookstorejdbc.service;
 
 import com.example.bookstorejdbc.data.dto.BookDto;
 import com.example.bookstorejdbc.data.entity.Book;
+import com.example.bookstorejdbc.data.entity.Buyer;
 import com.example.bookstorejdbc.data.mapper.BookMapper;
 import com.example.bookstorejdbc.repository.BookRepository;
 import com.example.bookstorejdbc.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
 @Service
 public class BookService {
-//    private final CrudRepository<Book> repository;
     private final BookRepository repository;
     private final BookMapper mapper;
 
@@ -26,8 +27,8 @@ public class BookService {
         return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
-    public BookDto getById(Integer id) {
-        return mapper.toDto(repository.findById(id));
+    public Optional<BookDto> getById(Integer id) {
+        return repository.findById(id).map(mapper::toDto);
     }
 
     public void addNewBook(BookDto book) {
@@ -35,14 +36,23 @@ public class BookService {
     }
 
     public void deleteBook(Integer id) {
-        repository.deleteById(id);
+        Optional<Book> bookOptional = repository.findById(id);
+        if (bookOptional.isPresent()) {
+            repository.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("Книга с id " + id + " не найдена");
+        }
     }
 
-    public void updateBook(BookDto buyer, Integer id) {
-        Book oldBook = repository.findById(id);
-        Book newBook = mapper.toEntity(buyer);
-        newBook.setBook_id(oldBook.getBook_id());
-        repository.update(newBook);
+    public void updateBook(BookDto book, Integer id) {
+        Book entity = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Покупатель с id " + id + " не найден"));
+        entity.setTitle(book.getTitle());
+        entity.setAuthor(book.getAuthor());
+        entity.setPrice(book.getPrice());
+        entity.setCategory_id(book.getCategory_id());
+        entity.setPublishing_house_id(book.getPublishing_house_id());
+        repository.update(entity);
     }
 
     public List<BookDto> getByCategoryId(Integer categoryId) {

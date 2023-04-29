@@ -1,12 +1,14 @@
 package com.example.bookstorejdbc.service;
 
 import com.example.bookstorejdbc.data.dto.BuyerDto;
+import com.example.bookstorejdbc.data.entity.Book;
 import com.example.bookstorejdbc.data.entity.Buyer;
 import com.example.bookstorejdbc.data.mapper.BuyerMapper;
 import com.example.bookstorejdbc.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,8 +25,8 @@ public class BuyerService {
         return repository.findAll().stream().map(mapper::toDto).collect(Collectors.toList());
     }
 
-    public BuyerDto getById(Integer id) {
-        return mapper.toDto(repository.findById(id));
+    public Optional<BuyerDto> getById(Integer id) {
+        return repository.findById(id).map(mapper::toDto);
     }
 
     public void addNewBuyer(BuyerDto buyer) {
@@ -32,13 +34,21 @@ public class BuyerService {
     }
 
     public void deleteBuyer(Integer id) {
-        repository.deleteById(id);
+        Optional<Buyer> buyerOptional = repository.findById(id);
+        if (buyerOptional.isPresent()) {
+            repository.deleteById(id);
+        } else {
+            throw new IllegalArgumentException("Покупатель с id " + id + " не найдена");
+        }
     }
 
     public void updateBuyer(BuyerDto buyer, Integer id) {
-        Buyer oldBuyer = repository.findById(id);
-        Buyer newBuyer = mapper.toEntity(buyer);
-        newBuyer.setBuyer_id(oldBuyer.getBuyer_id());
-        repository.update(newBuyer);
+        Buyer entity = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Покупатель с id " + id + " не найден"));
+        entity.setFirst_name(buyer.getFirst_name());
+        entity.setSecond_name(buyer.getSecond_name());
+        entity.setPhone(buyer.getPhone());
+        entity.setEmail(buyer.getEmail());
+        repository.update(entity);
     }
 }
